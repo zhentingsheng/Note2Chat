@@ -1,0 +1,12 @@
+demjson3==3.0.6
+logger==1.4
+matplotlib==3.10.7
+numpy==2.3.4
+openai==2.7.2
+pandas==2.3.3
+peft==0.15.2
+python_Levenshtein==0.27.3
+Requests==2.32.5
+torch==2.6.0
+transformers==4.50.0
+vllm==0.8.5.post1
