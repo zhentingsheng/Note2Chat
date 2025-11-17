@@ -134,27 +134,21 @@ bash dpo/run_multi_turn_dpo.sh
 ```
 
 #### 2.2 Single-turn
-##### sft
-```bash
-bash sft/single_turn_sft_gpt.sh
-```
-##### self-augmented trajectory sampling
-```bash
-bash sft/multi_turn_sft_gpt_sampling.sh
-```
-##### dpo
+This section will be updated shortly.
 
-```bash
-conda activate dpo
-bash dpo/run_multi_turn.sh
-```
 
 ### 3. Run Evaluation
+This section will be updated shortly.
 
-```bash
-conda activate vllm
 
-python3 src/pipelines/zeroshot_experiments.py
-python3 src/pipelines/history_taking.py
-python3 src/pipelines/single_turn_ablation.py
+## 🧃 Citation
+If `Note2Chat` has been beneficial to your research and work, please cite our work using the following format:
+
 ```
+@article{zhou2026note2chat,
+  title={Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes},
+  author={Zhou, Yang and Sheng, Zhenting and Tan, Mingrui and Song, Yuting and Zhou, Jun and Kwan, Yu Heng and Low, Lian Leng and Bai, Yang and Liu, Yong},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  year={2026},
+  note={AAAI 2026}
+}
