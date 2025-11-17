@@ -3,5 +3,6 @@ data/*
 !data/note_ids/*
 
 models/*
+adapters/*
 
 temp*
