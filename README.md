@@ -3,10 +3,7 @@
 <h1>Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes</h1>
 </div>
 
-## Abstract
-Effective clinical history taking is a foundational yet underexplored component of clinical reasoning. While large language models (LLMs) have shown promise on static benchmarks, they often fall short in dynamic, multi-turn diagnostic settings that require iterative questioning and hypothesis refinement. To address this gap, we propose Note2Chat, a note-driven framework that trains LLMs to conduct structured history taking and diagnosis by learning from widely available medical notes. Instead of relying on scarce and sensitive dialogue data, we convert real-world medical notes into high-quality doctor-patient dialogues using a decision tree-guided generation and refinement pipeline. We then propose a three-stage fine-tuning strategy combining supervised learning, simulated data augmentation, and preference learning. Furthermore, we propose a novel single-turn reasoning paradigm that reframes history taking as a sequence of single-turn reasoning problems. This design enhances interpretability and enables local supervision, dynamic adaptation, and greater sample efficiency. Experimental results show that our method substantially improves clinical reasoning, achieving gains of +16.9 F1 and +21.0 Top-1 diagnostic accuracy over GPT-4o. Our code and dataset can be found at https://github.com/zhentingsheng/Note2Chat.
-
-## Method
+## Overview
 ![](assets/Note2Chat.jpg)
 
 ## Dataset
@@ -148,10 +145,9 @@ This section will be updated shortly.
 If `Note2Chat` has been beneficial to your research and work, please cite our work using the following format:
 
 ```
-@article{zhou2026note2chat,
+@inproceedings{zhou2026note2chat,
   title={Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes},
   author={Zhou, Yang and Sheng, Zhenting and Tan, Mingrui and Song, Yuting and Zhou, Jun and Kwan, Yu Heng and Low, Lian Leng and Bai, Yang and Liu, Yong},
   booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
-  year={2026},
-  note={AAAI 2026}
+  year={2026}
 }
