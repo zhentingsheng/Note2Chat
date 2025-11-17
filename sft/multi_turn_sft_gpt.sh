@@ -12,9 +12,9 @@ conv_key=conv_revised
 
 python3 src/dataset_generate/generate_dataset_sft.py --dataset_dir $dataset_dir --trainset_path $trainset_path --conv_key $conv_key
 
-data_info_path=home/LLaMA-Factory/data/dataset_info.json
+data_info_path=/home/LLaMA-Factory/data/dataset_info.json
 
-python3 src/dataset_generate/update_data_info.py --trainset_name $trainset_name --filename Note2Chat/$trainset_path --formatting sharegpt --data_info_path $data_info_path
+python3 src/dataset_generate/update_data_info.py --trainset_name $trainset_name --filename /home/Note2Chat/$trainset_path --formatting sharegpt --data_info_path $data_info_path
 
 
 cd /home/LLaMA-Factory

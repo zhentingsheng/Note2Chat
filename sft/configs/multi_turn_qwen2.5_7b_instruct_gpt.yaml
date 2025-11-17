@@ -18,7 +18,7 @@ cutoff_len: 4096
 overwrite_cache: true
 
 ### output
-output_dir: /Note2Chat/models/sft/outputs/my_multi_turn_qwen2.5_7b_sft
+output_dir: /home/Note2Chat/adapters/my_multi_turn_qwen2.5_7b_sft
 logging_steps: 10
 save_steps: 500
 plot_loss: true

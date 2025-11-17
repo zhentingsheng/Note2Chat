@@ -4,11 +4,12 @@ import argparse
 from prompts.doctor import get_doctor_system_prompt
 
 class ConversationProcessor:
-    def __init__(self, dataset_dir,  trainset_path, conv_key='conv_revised'):
+    def __init__(self, dataset_dir,  trainset_path, conv_key='conv_revised', sampling_conv_key=None):
         self.dataset_dir = dataset_dir
         self.trainset_path = trainset_path
         self.trainset = []
         self.conv_key = conv_key
+        self.sampling_conv_key = sampling_conv_key
 
     def format_system_turn(self):
         return {
@@ -46,7 +47,12 @@ class ConversationProcessor:
             with open(path, 'r', encoding='utf-8') as f:
                 sample = json.load(f)
             
-            conversation = sample[self.conv_key]['conversation']
+            if self.sampling_conv_key and sample.get(self.sampling_conv_key):
+                conv_key = self.sampling_conv_key
+            else:
+                conv_key = self.conv_key
+        
+            conversation = sample[conv_key]['conversation']
 
             sample_sharegpt = self.build_sharegpt_sample(conversation)
             if sample_sharegpt:
@@ -81,11 +87,13 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_dir',type=str, required=True, help="dataset_dir")
     parser.add_argument('--trainset_path',type=str, required=True, help="trainset_path")
     parser.add_argument('--conv_key',type=str, required=True, help="conv_key")
+    parser.add_argument('--sampling_conv_key',default=None, required=True, help="sampling_conv_key")
 
     args = parser.parse_args()
     dataset_dir = args.dataset_dir
     trainset_path = args.trainset_path
     conv_key = args.conv_key
+    sampling_conv_key = args.sampling_conv_key
 
     trainset_dir = os.path.dirname(trainset_path)
     if not os.path.exists(trainset_dir):
@@ -95,5 +103,6 @@ if __name__ == '__main__':
         dataset_dir=dataset_dir,
         trainset_path=trainset_path,
         conv_key=conv_key,
+        sampling_conv_key=sampling_conv_key
     )
     processor.process()
