@@ -20,10 +20,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-MODELS = "/models"
+MODELS = "models"
 
-# PATIENT_MODEL = f"{MODELS}/Qwen2.5-32B-Instruct-GPTQ-Int8"
-PATIENT_MODEL = "/mnt/data/zy/zhenting/models/Qwen2.5-7B-Instruct"
+PATIENT_MODEL = "models/Qwen2.5-32B-Instruct-GPTQ-Int8"
 DATASET_MULTI_TURN = "data/dataset/multi_turn/test_raw"
 
 RESULTS_DIR = "results"
@@ -48,12 +47,7 @@ class Experiment:
     model_name: Optional[str] = None
     lora_path: Optional[str] = None
     dataset_dir: str = DATASET_MULTI_TURN
-    output_dir: str
-
-    # @property
-    # def output_dir(self) -> str:
-    #     return f"{RESULTS_DIR}/{self.name}"
-    
+    output_dir: Optional[str] = None
 
 sentence_evaluator = SentenceEvaluator(
     conv_key='conv_inference',
