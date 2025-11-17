@@ -130,7 +130,7 @@ bash sft/multi_turn_sft_gpt_sampling.sh
 
 ```bash
 conda activate dpo
-bash dpo/run_multi_turn.sh
+bash dpo/run_multi_turn_dpo.sh
 ```
 
 #### 2.2 Single-turn

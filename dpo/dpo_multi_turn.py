@@ -225,13 +225,14 @@ if __name__ == "__main__":
     output_dir = f'{output_dir}/output'
     # os.makedirs(output_dir, exist_ok=True)
 
-    if trainset_name == 'multi_turn':
-        # train_dataset = prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir)
-        train_dataset = load_dataset(
-            'json',
-            data_files='/mnt/data/zy/zhenting/final_version/history_taking/data/dataset/multi_turn/trainset_dpo.json',
-            split='train'
-        )
+    train_dataset = prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir)
+    # if trainset_name == 'multi_turn':
+    #     # train_dataset = prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir)
+    #     train_dataset = load_dataset(
+    #         'json',
+    #         data_files='/mnt/data/zy/zhenting/final_version/history_taking/data/dataset/multi_turn/trainset_dpo.json',
+    #         split='train'
+    #     )
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         attn_implementation="flash_attention_2",
