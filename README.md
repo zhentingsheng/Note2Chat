@@ -141,7 +141,7 @@ This section will be updated shortly.
 This section will be updated shortly.
 
 
-## 🧃 Citation
+## Citation
 If `Note2Chat` has been beneficial to your research and work, please cite our work using the following format:
 
 ```
