@@ -38,7 +38,7 @@ if __name__=='__main__':
                     supported_sentences, _ = sentence_evaluator.evaluate(note_id, conversation, evaluate_chief_complaint=True)
                     break
                 except Exception as e:
-                    print(f"Attempt {attempt} failed: {e}")
+                    print(f"Attempt {3 - max_retries + 1} failed: {e}")
                     max_retries -= 1
                     continue
 
