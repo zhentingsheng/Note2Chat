@@ -42,12 +42,20 @@ pip install -r requirements-dpo.txt
 conda deactivate
 ```
 
-### 3. Download the neccessary models
+### 3. Setup llama-factory
+```bash
+git clone https://github.com/hiyouga/llama-factory.git
+cd llama-factory
+```
+Set up the environment for llama-factory.
+
+
+### 4. Download the neccessary models
 
 - [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/tree/main)
 - [Qwen2.5-32B-Instruct-GPTQ-Int8](https://huggingface.co/Qwen/Qwen2.5-32B-Instruct-GPTQ-Int8/tree/main)
 
-### 4. Data Acquisition
+### 5. Data Acquisition
 
 #### Data Source
 Obtain clinical case data from the [PhysioNet MIMIC-IV](https://physioNet.org/content/mimiciv/3.1/) database.
@@ -99,44 +107,33 @@ Once your environment is set up, you can run the experiments:
 bash scripts/preprocessing.sh
 ```
 
-### 1. Decision Tree-Guided Generation and Refinement Pipeline
+### 1. Note2Chat Data Curation - Decision Tree-Guided Generation and Refinement Pipeline
 
 ```bash
 bash scripts/dialogue_synthesis.sh
 ```
 
-### 3. Three-stage Fine-tuning Strategy
+### 2. Note2Chat Model Training - Three-stage Fine-tuning Strategy
 
-#### 3.1 Multi-turn
-##### setup llama-factory
-```bash
-git clone https://github.com/hiyouga/llama-factory.git
-cd llama-factory
-```
-Set up the environment for llama-factory.
+#### 2.1 Multi-turn
 
-##### sft
+##### SFT
 ```bash
 bash sft/multi_turn_sft_gpt.sh
 ```
-
-
-```
-##### self-augmented trajectory sampling
+##### Self-Augmented Trajectory Sampling
 ```bash
-
-sampling....
-
+bash scripts/multi_turn_sampling.sh
 bash sft/multi_turn_sft_gpt_sampling.sh
 ```
-##### dpo
+##### DPO
 
 ```bash
 conda activate dpo
 bash dpo/run_multi_turn.sh
 ```
 
-#### 3.2 Single-turn
+#### 2.2 Single-turn
 ##### sft
 ```bash
 bash sft/single_turn_sft_gpt.sh
@@ -150,22 +147,6 @@ bash sft/multi_turn_sft_gpt_sampling.sh
 ```bash
 conda activate dpo
 bash dpo/run_multi_turn.sh
-```
-
-
-
-
-
-
-
-bash sft/single_turn_sft_gpt_summary_plan.sh
-bash sft/single_turn_sft_gpt_sampling_summary_plan.sh
-```
-#### For DPO
-```bash
-conda activate dpo
-bash dpo/run_multi_turn.sh
-bash dpo/run_single_turn.sh
 ```
 
 ### 3. Run Evaluation
