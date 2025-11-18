@@ -12,8 +12,7 @@ if [[ "$MODEL_PATH" == *"GPTQ"* ]]; then
   EXTRA_ARGS+=(--quantization gptq)
 fi
 
-
-CUDA_VISIBLE_DEVICES=4,5 python -m vllm.entrypoints.openai.api_server \
+python -m vllm.entrypoints.openai.api_server \
     --model $MODEL_ID \
     --max-model-len 16384 \
     --gpu_memory_utilization 0.8 \

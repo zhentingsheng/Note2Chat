@@ -14,7 +14,7 @@ hpi_sentence_categories_path=data/processed/hpi_sentence_categories.json
 # Step 0: Starting vllm service...
 echo "Starting vllm service..."
 port=8001
-bash scripts/start_vllm_server.sh $port $model_id &
+CUDA_VISIBLE_DEVICES=4,5 bash scripts/start_vllm_server.sh $port $model_id &
 
 echo "Waiting for vllm service to be ready..."
 while ! nc -zv localhost $port; do
