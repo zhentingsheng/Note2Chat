@@ -51,7 +51,7 @@ else
   echo "Target directory $TARGET already exists. Skipping copy."
 fi
 
-note2chat_dir=/mnt/data/zy/zhenting/final_version
+note2chat_dir=/home
 
 dataset_dir=$TARGET
 model_name=$note2chat_dir/Note2Chat/models/my_multi_turn_qwen2.5_7b_sft_sampling

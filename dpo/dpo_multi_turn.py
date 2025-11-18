@@ -12,7 +12,6 @@ from transformers import (
 from trl import DPOConfig, DPOTrainer
 from collections import defaultdict
 import random
-from datasets import load_dataset
 
 DOCTOR_PROMPT_V1 = '''\
 You are a doctor. Your task is to gather the patient's symptoms without giving explanations or sharing \
@@ -86,7 +85,7 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
             precision = support_total / (conv_len / 2)
             if precision > 1.0:
                 precision = 1.0
-            f1 = calculate_f1(precision, recall)
+            # f1 = calculate_f1(precision, recall)
             
             note_id = sample['note_id']
             conv_len = len(conversation)
@@ -104,8 +103,6 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
                 
                 if conversation[i]['role'] == 'user' and conversation[i]['content'] == "Sorry, you've already asked this question.":
                     repeated += 1
-                # if conversation[i]['role'] == 'user' and conversation[i]['content'] == "I don't know.":
-                #     repeated += 1
                 
                 if i != 0 and i % 2 == 1 and conversation[i]['role'] != 'user':
                     print(full_path, i, conversation[i]['role'])
@@ -115,8 +112,6 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
 
             prompt = conversation[:2]
             response = conversation[2:]
-            # score = recall - len_penalty * conv_len / 2 - repeated_penalty * repeated
-            # score = f1
             score = (5 - ddx_rank) / 5 * recall
             if ddx_rank < 0:
                 score = 0
@@ -125,7 +120,6 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
 
     print(len(note_id_trajectories.keys()))
 
-    # chosen_turns, rejected_turns = [], []
     prompts = []
     chosens = []
     rejecteds = []
@@ -145,17 +139,10 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
                 chosen = trajectories[i]['response']
                 rejected = trajectories[j]['response']
                 margin = trajectories[i]['score'] - trajectories[j]['score']
-                # if margin <= 0:
-                #     continue
-                # if margin < margin_min:
-                #     continue
                 temp_prompts.append(prompt)
                 temp_chosens.append(chosen)
                 temp_rejecteds.append(rejected)
                 temp_margins.append(margin)
-                # margins.append(margin)
-                # chosen_turns.append(len(chosen))
-                # rejected_turns.append(len(rejected))
         sampled_prompts, sampled_chosens, sampled_rejecteds, sampled_margins = sample_without_shuffle(temp_prompts, temp_chosens, temp_rejecteds, temp_margins, each_note_max_samples)
 
         for prompt, chosen, rejected, margin in zip(sampled_prompts, sampled_chosens, sampled_rejecteds, sampled_margins):
@@ -163,9 +150,6 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
             chosens.append(chosen)
             rejecteds.append(rejected)
             margins.append(margin)
-
-    # print(sum(chosen_turns) / len(chosen_turns))
-    # print(sum(rejected_turns) / len(rejected_turns))
 
     print(f"Loaded {len(prompts)} prompts")
     print(f"Loaded {len(chosens)} chosen responses")
@@ -179,8 +163,6 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
     # print("margin: ", margins[0])
 
     dataset = Dataset.from_dict({"prompt": prompts, "chosen": chosens, "rejected": rejecteds, "margin": margins})
-    # shuffled_dataset = dataset.shuffle(seed=42)
-    # subset = shuffled_dataset.select(range(min(max_samples, len(shuffled_dataset))))
 
     dataset.to_json(f"{config_dir}/trainset.json", orient="records", lines=True)
 
@@ -190,11 +172,7 @@ def prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="multi_turn_dpo")
     parser.add_argument('--model_name',type=str, required=True, help="model_name")
-    # parser.add_argument('--len_penalty',type=float, required=True, help="len_penalty")
     parser.add_argument('--trainset_name',type=str, required=True, help="trainset_name")
-    # parser.add_argument('--doctor_system_prompt',type=str, required=True, help="trainset_name")
-    # parser.add_argument('--margin_min',type=float, required=True, help="margin_min")
-    # parser.add_argument('--repeated_penalty',type=float, required=True, help="repeated_penalty")
     parser.add_argument('--each_note_max_samples',type=int, required=True, help="each_note_max_samples")
     parser.add_argument('--output_dir',type=str, required=True, help="output_dir")
     parser.add_argument('--dataset_dir',type=str, required=True, help="dataset_dir")
@@ -202,11 +180,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model_name = args.model_name
-    # len_penalty = args.len_penalty
     trainset_name = args.trainset_name
-    # doctor_system_prompt = args.doctor_system_prompt
-    # margin_min = args.margin_min
-    # repeated_penalty = args.repeated_penalty
     each_note_max_samples = args.each_note_max_samples
     output_dir = args.output_dir
     dataset_dir = args.dataset_dir
@@ -216,23 +190,15 @@ if __name__ == "__main__":
     run_name = "dpo_" + trainset_name + model_name.split("/")[-1].lower() + '_' + timestamp
 
     config_dir = f'{output_dir}/config'
-    # os.makedirs(detail_dir, exist_ok=True)
 
     config_path = os.path.join(config_dir, 'run_config.json')
     with open(config_path, "w") as f:
         json.dump(vars(args), f, indent=4)
 
     output_dir = f'{output_dir}/output'
-    # os.makedirs(output_dir, exist_ok=True)
 
     train_dataset = prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir)
-    # if trainset_name == 'multi_turn':
-    #     # train_dataset = prepare_data_for_multi_turn(dataset_dir, each_note_max_samples, config_dir)
-    #     train_dataset = load_dataset(
-    #         'json',
-    #         data_files='/mnt/data/zy/zhenting/final_version/history_taking/data/dataset/multi_turn/trainset_dpo.json',
-    #         split='train'
-    #     )
+
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         attn_implementation="flash_attention_2",
@@ -244,8 +210,6 @@ if __name__ == "__main__":
     tokenizer.pad_token = tokenizer.eos_token
 
     print(f"Number of training samples: {len(train_dataset)}")
-
-    # print(tokenizer.all_special_tokens)
 
     training_args = DPOConfig(
         per_device_train_batch_size=8,
