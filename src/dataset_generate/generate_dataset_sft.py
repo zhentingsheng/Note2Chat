@@ -87,7 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_dir',type=str, required=True, help="dataset_dir")
     parser.add_argument('--trainset_path',type=str, required=True, help="trainset_path")
     parser.add_argument('--conv_key',type=str, required=True, help="conv_key")
-    parser.add_argument('--sampling_conv_key',default=None, required=True, help="sampling_conv_key")
+    parser.add_argument('--sampling_conv_key',default=None, help="sampling_conv_key")
 
     args = parser.parse_args()
     dataset_dir = args.dataset_dir

@@ -10,7 +10,7 @@ base_model_path=models/Qwen2.5-7B-Instruct
 adapter_path=adapters/my_multi_turn_qwen2.5_7b_sft_sampling
 merged_model_path=models/my_multi_turn_qwen2.5_7b_sft_sampling
 
-python merge_adapter.py --base_model_path $base_model_path --adapter_path $adapter_path --merged_model_path $merged_model_path
+python src/merge_adapter.py --base_model_path $base_model_path --adapter_path $adapter_path --merged_model_path $merged_model_path
 
 conda activate dpo
 
@@ -51,9 +51,10 @@ else
   echo "Target directory $TARGET already exists. Skipping copy."
 fi
 
+note2chat_dir=/mnt/data/zy/zhenting/final_version
 
 dataset_dir=$TARGET
-model_name=/home/Note2Chat/models/my_multi_turn_qwen2.5_7b_sft_sampling
+model_name=$note2chat_dir/Note2Chat/models/my_multi_turn_qwen2.5_7b_sft_sampling
 trainset_name=multi_turn
 each_note_max_samples=1
 
@@ -71,7 +72,7 @@ mkdir -p $config_dir
 adapter_dir=$output_dir/output
 mkdir -p $adapter_dir
 
-CUDA_VISIBLE_DEVICES=1,2,3,4 accelerate launch --num-processes 4 --main_process_port 29505 --config-file dpo/configs/zero3.yaml dpo/dpo_multi_turn.py \
+CUDA_VISIBLE_DEVICES=0,1,2,3 accelerate launch --num-processes 4 --main_process_port 29505 --config-file dpo/configs/zero3.yaml dpo/dpo_multi_turn.py \
     --dataset_dir $dataset_dir \
     --model_name $model_name \
     --trainset_name $trainset_name \

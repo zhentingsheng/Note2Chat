@@ -12,14 +12,14 @@ lora_target: all
 
 
 ### dataset
-dataset: final_version_single_turn_sampling_summary_plan
+dataset: note2chat_single_turn_sft_gpt_sampling
 
 template: qwen
 cutoff_len: 4096
 overwrite_cache: true
 
 ### output
-output_dir: /home/Note2Chat/adapters/my_single_turn_sft_sampling
+output_dir: /home/Note2Chat/adapters/my_single_turn_qwen2.5_7b_sft_sampling
 logging_steps: 10
 save_steps: 500
 plot_loss: true

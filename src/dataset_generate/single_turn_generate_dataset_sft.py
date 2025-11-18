@@ -114,7 +114,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--dataset_dir',type=str, required=True, help="dataset_dir")
     parser.add_argument('--trainset_path',type=str, required=True, help="trainset_path")
-    parser.add_argument('--with_sampling',type=str, required=True, help="with_sampling")
+    parser.add_argument('--with_sampling',type=bool, default=False, help="with_sampling")
 
     args = parser.parse_args()
     dataset_dir = args.dataset_dir

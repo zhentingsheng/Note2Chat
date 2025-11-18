@@ -16,6 +16,7 @@ To set up your environment and run Note2Chat, follow these steps:
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/zhentingsheng/Note2Chat.git
+cd Note2Chat
 ```
 
 ### 2. Setup the environment
@@ -52,8 +53,10 @@ Set up the environment for llama-factory.
 
 ### 4. Download the neccessary models
 
-- [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/tree/main)
-- [Qwen2.5-32B-Instruct-GPTQ-Int8](https://huggingface.co/Qwen/Qwen2.5-32B-Instruct-GPTQ-Int8/tree/main)
+- [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
+- [Qwen2.5-32B-Instruct-GPTQ-Int8](https://huggingface.co/Qwen/Qwen2.5-32B-Instruct-GPTQ-Int8)
+
+Download the necessary `models` into the models directory.
 
 ### 5. Data Acquisition
 
@@ -95,7 +98,6 @@ Using the provided note IDs, extract the following key clinical information from
     └── notes/
         └── notes.csv
     ```
-
 
 ## Experiment Scripts
 
@@ -147,6 +149,7 @@ bash sft/single_turn_sft_gpt_sampling.sh
 ```
 
 ##### DPO
+
 
 
 ### 3. Run Evaluation

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     data_info_path = args.data_info_path
 
     dataset_info = {
-        "filename": filename
+        "file_name": filename
     }
 
     if formatting == 'sharegpt':

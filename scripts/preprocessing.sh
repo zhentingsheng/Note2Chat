@@ -32,4 +32,5 @@ python3 src/preprocessing/hpi_sentences_splitter.py --model_id $model_id --note_
 # Step 3: Classify sentences using LLM
 python3 src/preprocessing/hpi_sentences_classifier.py --model_id $model_id --hpi_sentences_path $hpi_sentences_path --hpi_sentence_categories_path  $hpi_sentence_categories_path --num_threads 10
 
-kill $(lsof -t -i :$port)
+
+echo "done"
