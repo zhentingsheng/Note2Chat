@@ -134,7 +134,19 @@ bash dpo/run_multi_turn_dpo.sh
 ```
 
 #### 2.2 Single-turn
-This section will be updated shortly.
+
+##### SFT
+```bash
+bash scripts/single_turn_add_thought.sh
+bash sft/single_turn_sft_gpt.sh
+```
+
+##### Self-Augmented Trajectory Sampling
+```bash
+bash sft/single_turn_sft_gpt_sampling.sh
+```
+
+##### DPO
 
 
 ### 3. Run Evaluation

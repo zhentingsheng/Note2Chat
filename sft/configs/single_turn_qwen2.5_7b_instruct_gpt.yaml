@@ -1,7 +1,7 @@
 
 
 ### model
-model_name_or_path: Note2Chat/models/Qwen2.5-7B-Instruct
+model_name_or_path: /home/Note2Chat/models/Qwen2.5-7B-Instruct
 
 ### method
 stage: sft
@@ -12,14 +12,14 @@ lora_target: all
 
 
 ### dataset
-dataset: final_version_single_turn_summary_plan
+dataset: note2chat_single_turn_sft_gpt
 
 template: qwen
 cutoff_len: 4096
 overwrite_cache: true
 
 ### output
-output_dir: Note2Chat/models/my_single_turn_sft
+output_dir: /home/Note2Chat/adapters/my_single_turn_qwen2.5_7b_sft
 logging_steps: 10
 save_steps: 500
 plot_loss: true
