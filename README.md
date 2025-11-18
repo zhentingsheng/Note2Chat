@@ -149,8 +149,11 @@ bash sft/single_turn_sft_gpt_sampling.sh
 ```
 
 ##### DPO
-
-
+```bash
+bash scripts/single_turn_sampling.sh
+bash scripts/single_turn_sampling_eval.sh
+bash dpo/run_single_turn_dpo.sh
+```
 
 ### 3. Run Evaluation
 This section will be updated shortly.

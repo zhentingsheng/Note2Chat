@@ -31,18 +31,18 @@ def process_file(full_path, output_dir, model_id):
             sample = json.load(f)
         conv_key = 'conv_inference' if 'conv_inference' in sample else 'conv_revised'
         conversation = sample[conv_key]['conversation']
-        preliminary_diagnoses = sample[conv_key]['preliminary_diagnoses']
-        try:
-            while isinstance(preliminary_diagnoses, str):
-                preliminary_diagnoses = demjson3.decode(preliminary_diagnoses)
-            last_turn = ''
-            if isinstance(preliminary_diagnoses, dict):
-                preliminary_diagnoses = preliminary_diagnoses['preliminary_diagnoses']
-            for item in preliminary_diagnoses:
-                last_turn += f'disease: {item["disease"]}, reason: {item["reason"]}, '
-            conversation[-1]['content'] = last_turn
-        except Exception:
-            pass
+        # preliminary_diagnoses = sample[conv_key]['preliminary_diagnoses']
+        # # try:
+        # while isinstance(preliminary_diagnoses, str):
+        #     preliminary_diagnoses = demjson3.decode(preliminary_diagnoses)
+        # last_turn = ''
+        # if isinstance(preliminary_diagnoses, dict):
+        #     preliminary_diagnoses = preliminary_diagnoses['preliminary_diagnoses']
+        # for item in preliminary_diagnoses:
+        #     last_turn += f'disease: {item["disease"]}, reason: {item["reason"]}, '
+        # conversation[-1]['content'] = last_turn
+        # except Exception:
+        #     pass
 
         conversation = format_conversation(conversation)
 
@@ -113,6 +113,9 @@ if __name__ == '__main__':
     output_dir = args.single_turn_sample_dir
     model_id = args.model_id
     num_threads = args.num_threads
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     files_to_process = []
     for root, _, files in os.walk(input_dir):

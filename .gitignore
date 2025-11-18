@@ -6,3 +6,4 @@ models/*
 adapters/*
 
 temp*
+*.pyc

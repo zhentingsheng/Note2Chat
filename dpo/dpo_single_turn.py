@@ -1,18 +1,13 @@
 import os
 from peft import LoraConfig
-import torch
-from datasets import Dataset, load_dataset
+from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
 )
-from trl import DPOConfig
-# from dpo_trainer import MyDPOTrainer
-from trl import DPOTrainer
+from trl import DPOConfig, DPOTrainer
 from datetime import datetime
 import json
-from collections import defaultdict
-import re
 import argparse
 import random
 from statistics import mean, stdev
@@ -62,18 +57,10 @@ def calc_score(in_history, in_note, ddx_match_index, recall, gpt_recall):
     if ddx_match_index is not None:
         if ddx_match_index == -1:
             return 0
-        # recall *= 2
-        # if recall > 1:
-        #     recall = 1
         recall_weight = recall / gpt_recall
         return (5 - ddx_match_index) / 5 * recall_weight
     
     if in_history is not None and in_note is not None:
-        # if in_history:
-        #     return -1
-        # if in_note:
-        #     return 1
-        # return 0
         if 'no' in in_history.lower() and 'yes' in in_note.lower():
             return 1
         else:
@@ -149,28 +136,26 @@ def construct_dpo_pairs(
 
     return pairs    
 
-def prepare_data_for_single_turn(max_samples, config_dir):
-    # single_turn_dir = '/home/zhouyang/history_taking/data/dataset/single_turn/sampling'
-    data_dir = '/home/zhouyang/history_taking/data/dataset/single_turn/'
+def prepare_data_for_single_turn(max_samples, config_dir, data_dir):
     prompts = []
     chosens = []
     rejecteds = []
     margins = []
     full_paths = []
-    for root, _, files in os.walk(os.path.join(data_dir, "new_sampling")):
+
+    gpt_dir = 'data/gpt_dialogues'
+    for root, _, files in os.walk(data_dir):
         for file in files:
             full_path = os.path.join(root, file)
-            # if full_path != '/mnt/data/zy/zhenting/final_version/history_taking/data/dataset/single_turn/sampling/10165522-DS-9_sampling_2.json':
-            #     continue
 
             # Extract the base filename and remove the trailing _number
             base = os.path.basename(full_path)  # '11459358-DS-12_0.json'
             note_name = base.split('_')[0] + '.json'  # '11459358-DS-12.json'
             # Construct the gpt_sample path
-            gpt_full_path = os.path.join(data_dir, "train_raw", note_name)
+            gpt_full_path = os.path.join(gpt_dir, note_name)
             with open(gpt_full_path, 'r', encoding='utf-8') as f:
                 gpt_sample = json.load(f)
-            gpt_recall = gpt_sample['eval_revised']['recall']['recall']
+            gpt_recall = gpt_sample['eval_revised']['symptom']['recall']
 
             with open(full_path, 'r', encoding='utf-8') as f:
                 sample = json.load(f)
@@ -179,16 +164,8 @@ def prepare_data_for_single_turn(max_samples, config_dir):
             turn_number = sample['turn_number']
             input = build_single_turn_input(history)
 
-            # if turn_number > 0:
-            #     continue
-
-            # if '<think>' not in input:
-            #     continue
-
             if turn_number > 0 and '<think>' not in input:
                 continue
-            # print(input)
-            # print(full_path)
             prompt = [
                 {'role': 'system', 'content': DEFAULT_HISTORY_TAKING_PROMPT},
                 {'role': 'user', 'content': input}
@@ -210,28 +187,6 @@ def prepare_data_for_single_turn(max_samples, config_dir):
             if len(outputs_filtered) == 0:
                 continue
             outputs_filtered.sort(key=lambda x: x['score'], reverse=True)
-            # if outputs_filtered[0]['score'] < 0.8:
-            #     continue
-
-            # for i in range(len(outputs_filtered)):
-            #     chosen = outputs_filtered[i]['output']
-            #     score_i = outputs_filtered[i]['score']
-            #     for j in range(i + 1, len(outputs_filtered)):
-            #         rejected = outputs_filtered[j]['output']
-            #         score_j = outputs_filtered[j]['score']
-            #         if score_i <= score_j:
-            #             continue
-            #         prompts.append(prompt)
-            #         chosens.append(chosen)
-            #         rejecteds.append(rejected)
-            #         margins.append(score_i - score_j)
-            #         full_paths.append(full_path)
-
-            # best_ddx = outputs_filtered[0].get('ddx_match_index')
-            # if best_ddx is None and outputs_filtered[0]['score'] == 0:
-            #     continue
-            # if best_ddx is not None and outputs_filtered[0]['score'] == 0:
-            #     continue
 
             if outputs_filtered[0]['score'] == 0:
                 continue
@@ -277,90 +232,40 @@ def prepare_data_for_single_turn(max_samples, config_dir):
     print("rejected: ", rejecteds[0])
     print("margin: ", margins[0])
 
+    prompts = prompts[:max_samples]
+    chosens = chosens[:max_samples]
+    rejecteds = rejecteds[:max_samples]
+    margins = margins[:max_samples]
+
 
     dataset = Dataset.from_dict({"prompt": prompts, "chosen": chosens, "rejected": rejecteds, "margin": margins})
     dataset.to_json(f"{config_dir}/trainset.json", orient="records", lines=True)
-    # shuffled_dataset = dataset.shuffle(seed=42)
-    # subset = shuffled_dataset.select(range(min(max_samples, len(shuffled_dataset))))
-    # subset.to_json(f"{config_dir}/trainset.json", orient="records", lines=True)
 
     return dataset
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
-    # parser.add_argument('--model_name',type=str, required=True, help="model_name")
-    # # parser.add_argument('--len_penalty',type=float, required=True, help="len_penalty")
-    # # parser.add_argument('--ideal_len',type=float, required=True, help="ideal_len")
-    # parser.add_argument('--trainset_name',type=str, required=True, help="trainset_name")
-    # # parser.add_argument('--doctor_system_prompt',type=str, required=True, help="trainset_name")
-    # # parser.add_argument('--chosen_min_score',type=float, required=True, help="chosen_min_score")
-    # # parser.add_argument('--rejected_min_score',type=float, required=True, help="rejected_min_score")
-    # parser.add_argument('--margin_min',type=float, required=True, help="margin_min")
-    # # parser.add_argument('--repeated_penalty',type=float, required=True, help="repeated_penalty")
-    # # parser.add_argument('--ddx_penalty',type=float, required=True, help="ddx_penalty")
-    # parser.add_argument('--max_samples',type=int, required=True, help="max_samples")
-    # parser.add_argument('--output_dir',type=str, required=True, help="output_dir")
-
-    parser.add_argument(
-        "--model_name",
-        type=str,
-        default="/home/zhouyang/history_taking/models/single_turn_summary_plan",
-        help="Path to the base model"
-    )
-
-    parser.add_argument(
-        "--trainset_name",
-        type=str,
-        default="note_single_turn",
-        help="Name of the training set"
-    )
-
-    parser.add_argument(
-        "--margin_min",
-        type=float,
-        default=-1.0,
-        help="Minimum margin for DPO loss"
-    )
-
-    parser.add_argument(
-        "--max_samples",
-        type=int,
-        default=45000,
-        help="Maximum number of training samples to use"
-    )
-
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="/home/zhouyang/history_taking/dpo/outputs_single_turn/test",  # leave None so you can build it dynamically just before training
-        help="Directory where checkpoints and logs will be written"
-    )
-
+    parser.add_argument('--model_name',type=str, required=True, help="model_name")
+    parser.add_argument('--trainset_name',type=str, required=True, help="Name of the training set")
+    parser.add_argument('--dataset_dir',type=str, required=True, help="Dir of the training set")
+    parser.add_argument('--margin_min',type=float, required=True, help="margin_min")
+    parser.add_argument('--max_samples',type=int, required=True, help="max_samples")
+    parser.add_argument('--output_dir',type=str, required=True, help="Directory where checkpoints and logs will be written")
 
     args = parser.parse_args()
 
     model_name = args.model_name
-    # len_penalty = args.len_penalty
-    # ideal_len = args.ideal_len
     trainset_name = args.trainset_name
-    # doctor_system_prompt = args.doctor_system_prompt
-    # chosen_min_score = args.chosen_min_score
-    # rejected_min_score = args.rejected_min_score
+    dataset_dir = args.dataset_dir
     margin_min = args.margin_min
-    # repeated_penalty = args.repeated_penalty
-    # ddx_penalty = args.ddx_penalty
     max_samples = args.max_samples
     output_dir = args.output_dir
-
-
-    # # len_penalty = 0.025
-    # len_penalty = 0.0
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_name = "dpo_" + model_name.split("/")[-1].lower() + '_' + trainset_name + timestamp
 
     config_dir = f'{output_dir}/config'
-    # os.makedirs(detail_dir, exist_ok=True)
+    os.makedirs(config_dir, exist_ok=True)
 
     config_path = os.path.join(config_dir, 'run_config.json')
     with open(config_path, "w") as f:
@@ -368,14 +273,11 @@ if __name__ == "__main__":
 
     output_dir = f'{output_dir}/output'
 
-    train_dataset = prepare_data_for_single_turn(max_samples, config_dir)
-    # train_dataset = load_dataset("json", data_files="/home/zhouyang/history_taking/dpo/outputs_single_turn/filtered_dataset.json", split="train")
-    # train_dataset = train_dataset.shuffle(seed=42)
+    train_dataset = prepare_data_for_single_turn(max_samples, config_dir, dataset_dir)
     
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         attn_implementation="flash_attention_2",
-        # torch_dtype=torch.bfloat16,
     )
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -434,7 +336,6 @@ if __name__ == "__main__":
     dpo_trainer = DPOTrainer(
         model,
         args=training_args,
-        # train_dataset=tokenized_dataset,
         train_dataset=train_dataset,
         processing_class=tokenizer,
         peft_config=lora_config,
