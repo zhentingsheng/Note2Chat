@@ -12,16 +12,20 @@ hpi_sentences_path=data/processed/hpi_sentences.jsonl
 hpi_sentence_categories_path=data/processed/hpi_sentence_categories.json
 
 # Step 0: Starting vllm service...
-echo "Starting vllm service..."
 port=8001
-CUDA_VISIBLE_DEVICES=4,5 bash scripts/start_vllm_server.sh $port $model_id &
 
-echo "Waiting for vllm service to be ready..."
-while ! nc -zv localhost $port; do
-  sleep 60
-done
+if nc -zv localhost $port 2>&1 | grep -q 'succeeded'; then
+  echo "patient agent service is already running on port $port. Skipping startup."
+else
+  echo "Starting patient agent service..."
+  CUDA_VISIBLE_DEVICES=4,5 bash scripts/start_vllm_server.sh $port $model_id &
 
-echo "vllm service is ready!"
+  echo "Waiting for vllm service to be ready..."
+  while ! nc -zv localhost $port; do
+    sleep 60
+  done
+  echo "vllm service is ready!"
+fi
 
 # Step 1: Split HPI section from discharge notes using LLM
 python3 src/preprocessing/hpi_splitter.py --model_id $model_id --note_path $note_path --note_hpi_path $note_hpi_path
