@@ -7,3 +7,6 @@ adapters/*
 
 temp*
 *.pyc
+wandb/*
+reports/*
+results/*

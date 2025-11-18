@@ -56,7 +56,7 @@ Set up the environment for llama-factory.
 - [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
 - [Qwen2.5-32B-Instruct-GPTQ-Int8](https://huggingface.co/Qwen/Qwen2.5-32B-Instruct-GPTQ-Int8)
 
-Download the necessary `models` into the models directory.
+Download the necessary models into the `models` directory.
 
 ### 5. Data Acquisition
 
@@ -156,8 +156,17 @@ bash dpo/run_single_turn_dpo.sh
 ```
 
 ### 3. Run Evaluation
-This section will be updated shortly.
+- [Qwen3-8B] (https://huggingface.co/Qwen/Qwen3-8B)
+- [DeepSeek-R1-0528-Qwen3-8B] (https://huggingface.co/deepseek-ai/DeepSeek-R1-0528-Qwen3-8B)
+- [HuatuoGPT-o1-8B] (https://huggingface.co/FreedomIntelligence/HuatuoGPT-o1-8B)
+- [MedGemma-4B-it] (https://huggingface.co/google/medgemma-4b-it)
+- [MedGemma-27B-text-it] (https://huggingface.co/google/medgemma-27b-text-it)
 
+Download these models into the `models` directory.
+
+```bash
+bash scripts/evaluation.sh
+```
 
 ## Citation
 If `Note2Chat` has been beneficial to your research and work, please cite our work using the following format:

@@ -98,7 +98,7 @@ class SimulatorBase:
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(sample, f, ensure_ascii=False, indent=2)
 
-    def run_on_dataset_batch(self, dataset_dir, output_dir):
+    def run_on_dataset_batch(self, test_set_paths, output_dir):
         os.makedirs(output_dir, exist_ok=True)
 
         conversation_history_doctor = []
@@ -106,42 +106,37 @@ class SimulatorBase:
         samples = []
         note_ids = []
         notes = []
-        
-        for root, _, files in os.walk(dataset_dir):
-            for file in files:
-                if not file.endswith('.json'):
-                    continue
-                output_path = os.path.join(output_dir, file)
-                if os.path.exists(output_path):
-                    with open(output_path, 'r', encoding='utf-8') as f:
-                        sample = json.load(f)
-                        if self.conv_key in sample and self.finished_conversation(0, sample[self.conv_key]['conversation'][-1]['content']):
-                            continue
-                full_path = os.path.join(root, file)
-                with open(full_path, 'r', encoding='utf-8') as f:
+
+        for path in test_set_paths:
+            filename = os.path.basename(path)
+            output_path = os.path.join(output_dir, filename)
+            if os.path.exists(output_path):
+                with open(output_path, 'r', encoding='utf-8') as f:
                     sample = json.load(f)
+                    if self.conv_key in sample and self.finished_conversation(0, sample[self.conv_key]['conversation'][-1]['content']):
+                        continue
+            with open(path, 'r', encoding='utf-8') as f:
+                sample = json.load(f)
 
-                samples.append(sample)
+            samples.append(sample)
 
-                note_id = sample['note_id']
-                note_ids.append(note_id)
+            note_id = sample['note_id']
+            note_ids.append(note_id)
 
-                hpi = sample['hpi']
-                notes.append(hpi)
-                patient_chief_complaint = sample['conv_revised']['conversation'][0]['content']
-                
-                conversation_doctor = [
-                    {"role": "system", "content": self.doctor_system_instruct},
-                    {"role": "user", "content": patient_chief_complaint}
-                ]
-                conversation_patient = [
-                    {"role": "system", "content": get_patient_system_prompt(hpi)},
-                    {"role": "assistant", "content": patient_chief_complaint}
-                ]
-                conversation_history_doctor.append(conversation_doctor)
-                conversation_history_patient.append(conversation_patient)
-
-
+            hpi = sample['hpi']
+            notes.append(hpi)
+            patient_chief_complaint = sample['conv_revised']['conversation'][0]['content']
+            
+            conversation_doctor = [
+                {"role": "system", "content": self.doctor_system_instruct},
+                {"role": "user", "content": patient_chief_complaint}
+            ]
+            conversation_patient = [
+                {"role": "system", "content": get_patient_system_prompt(hpi)},
+                {"role": "assistant", "content": patient_chief_complaint}
+            ]
+            conversation_history_doctor.append(conversation_doctor)
+            conversation_history_patient.append(conversation_patient)
 
         index = 1
         while conversation_history_doctor != []:

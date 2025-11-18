@@ -4,7 +4,8 @@ import logging
 import sys
 import os
 import json
-from dataclasses import dataclass
+import csv
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from simulator.simulator import build_simulator_openllm, build_simulator_gpt
@@ -23,20 +24,34 @@ logger = logging.getLogger(__name__)
 MODELS = "models"
 
 PATIENT_MODEL = "models/Qwen2.5-32B-Instruct-GPTQ-Int8"
-DATASET_MULTI_TURN = "data/dataset/multi_turn/test_raw"
+TEST_SET_PATHS = []
+
+testset_note_ids = []
+testset_note_ids_path = "data/note_ids/testset_note_ids.csv"
+with open(testset_note_ids_path, 'r', encoding='utf-8') as f:
+    csv_reader = csv.reader(f)
+    for line in csv_reader:
+        testset_note_ids.append(line[0])
+
+gpt_dialogue_dir = 'data/gpt_dialogues'
+for root, _, files in os.walk(gpt_dialogue_dir):
+    for file in files:
+        note_id = file[:-len('.json')]
+        if note_id in testset_note_ids:
+            full_path = os.path.join(root, file)
+            TEST_SET_PATHS.append(full_path)
 
 RESULTS_DIR = "results"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 COMMON_SIMULATOR_KWARGS: Dict[str, object] = {
-    "max_turn": 30,
+    "max_turn": 26,
     "conv_key": "conv_inference",
     "system_instruct_version": "v1",
     "patient_model": PATIENT_MODEL,
 }
 
-EXPERIMENT_REPORT_DIR = 'logs'
-
+EXPERIMENT_REPORT_DIR = 'reports'
 
 @dataclass(slots=True)
 class Experiment:
@@ -46,7 +61,7 @@ class Experiment:
     model_path: Optional[str] = None
     model_name: Optional[str] = None
     lora_path: Optional[str] = None
-    dataset_dir: str = DATASET_MULTI_TURN
+    test_set_paths: List[str] = field(default_factory=lambda: TEST_SET_PATHS.copy())  
     output_dir: Optional[str] = None
 
 sentence_evaluator = SentenceEvaluator(
@@ -71,6 +86,8 @@ def run_experiment(exp: Experiment) -> None:
     """Build a simulator and launch a dataset batch run."""
     kwargs = COMMON_SIMULATOR_KWARGS | {"turn_mode": exp.turn_mode}
 
+    exp.output_dir = f'{RESULTS_DIR}/{exp.name}'
+
     if exp.name.startswith('zeroshot'):
         kwargs['system_instruct_version'] = 'v2'
 
@@ -83,12 +100,12 @@ def run_experiment(exp: Experiment) -> None:
     logger.info(
         "[%-30s] Running on dataset '%s' → '%s'",
         exp.name,
-        exp.dataset_dir,
+        'testset',
         exp.output_dir,
     )
 
     os.makedirs(exp.output_dir, exist_ok=True)
-    simulator.run_on_dataset_batch(exp.dataset_dir, exp.output_dir)
+    simulator.run_on_dataset_batch(exp.test_set_paths, exp.output_dir)
     logger.info("[%-30s] ✓ Completed", exp.name)
 
 
