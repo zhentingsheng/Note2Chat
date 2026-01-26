@@ -7,7 +7,7 @@
 ![](assets/Note2Chat.jpg)
 
 ## Dataset
-This section will be updated shortly.
+The Note2Chat dataset has been submitted to PhysioNet and is presently under review. Further updates will be provided soon.
 
 ## Setup
 
