@@ -1,7 +1,8 @@
-<div align="center">
+# Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes
 
-<h1>Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes</h1>
-</div>
+This repository includes the code for AAAI26 Paper: 
+
+"[Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes](https://arxiv.org/abs/2601.21551)"
 
 ## Overview
 ![](assets/Note2Chat.jpg)
