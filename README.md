@@ -179,5 +179,6 @@ If `Note2Chat` has been beneficial to your research and work, please cite our wo
   title={Note2Chat: Improving LLMs for Multi-Turn Clinical History Taking Using Medical Notes},
   author={Zhou, Yang and Sheng, Zhenting and Tan, Mingrui and Song, Yuting and Zhou, Jun and Kwan, Yu Heng and Low, Lian Leng and Bai, Yang and Liu, Yong},
   booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  pages ={35149--35157},
   year={2026}
 }
